@@ -9,22 +9,14 @@ import {
   // Way of changing state of a component
   VrButton
 } from 'react-360';
+import { connect, changeRoom } from './store';  //Pull in functions from store.js
 import house from './data/houseData';
 
-export default class HouseTourVR extends React.Component {
-  state = {
-    room: house.House.roomName,
-    info: house.House.info,
-    adjacentRooms: house.House.adjacentRooms
-  }
+// client.js contains code to render panel(s)
+export default class Buttons extends React.Component {
+
   clickHandler ( roomSelection ) {
-    this.setState( {
-    room: house[`${roomSelection}`].roomName,
-    info: house[`${roomSelection}`].info,
-    adjacentRooms: house[`${roomSelection}`].adjacentRooms,
-    } )
-    
-    Environment.setBackgroundImage(asset(`./360_${house[`${roomSelection}`].img}`))
+    changeRoom( roomSelection );
 }
 
   createRoomButtons ( adjacentRooms ) {
@@ -44,21 +36,32 @@ export default class HouseTourVR extends React.Component {
     return (
       <View style={styles.panel}>
         <View style={styles.greetingBox}>
-          <Text >
+          <Text style={styles.greetingBox}>
             Room Selection
           </Text>
           <Text>
-            {this.state.room}
+            {this.props.room}
           </Text>
-          {this.createRoomButtons(this.state.adjacentRooms)}
+          {this.createRoomButtons(this.props.adjacentRooms)}
         </View>
+      </View>
+    );
+  }
+};
+
+
+export class HouseInfoPanel extends React.Component {
+
+  render() {
+    return (
+      <View style={styles.panel}>
         
-        <View style={ styles.greetingBox }>
+        <View>
           <Text>
             Room Info
           </Text>
           <Text>
-            {this.state.info}
+            {this.props.info}
           </Text>
         </View>
       </View>
@@ -66,21 +69,25 @@ export default class HouseTourVR extends React.Component {
   }
 };
 
+// Use 'connect' function from store.js
+const ConnectedButtons = connect( Buttons );
+const ConnectedHouseInfoPanel = connect( HouseInfoPanel );
+
 const styles = StyleSheet.create({
   panel: {
     // Fill the entire surface
     width: 1000,
     height: 600,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   greetingBox: {
     padding: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderColor: 'grey',
-    borderWidth: 2,
   }
 });
 
-AppRegistry.registerComponent('HouseTourVR', () => HouseTourVR);
+AppRegistry.registerComponent('ConnectedButtons', () => ConnectedButtons);
+AppRegistry.registerComponent('ConnectedHouseInfoPanel', () => ConnectedHouseInfoPanel);
